@@ -1,0 +1,152 @@
+library(readxl)
+library(readxl)
+Aggregate_Data_at_Member_Level_US <- read_excel("*******/Aggregate Data at Member Level_US.xlsx",skip = 1)
+View(Aggregate_Data_at_Member_Level_US)
+colnames(Aggregate_Data_at_Member_Level_US)
+glimpse(Aggregate_Data_at_Member_Level_US)
+
+data_ISP_NI<-Aggregate_Data_at_Member_Level_US%>%filter(Class=="ISP",Cust_type=="NI")
+data_ISP_I<-Aggregate_Data_at_Member_Level_US%>%filter(Class=="ISP",Cust_type=="I")
+
+########
+sample_data <- Filter(is.numeric,data_ISP_NI)
+sample_data <- Filter(is.numeric,data_ISP_NI)
+sample_data <- sample_data[,-c(1)]
+library(taRifx)
+sample_data <- japply( sample_data, which(sapply(sample_data, class)=="factor"), as.character )
+sample_data <- japply( sample_data, which(sapply(sample_data, class)=="character"), as.numeric )
+
+
+length_exclude_na<-function(x)
+{
+  length(x[!is.na(x)])
+}
+Mode <- function(x, na.rm = TRUE) 
+{
+  if(na.rm){
+    x = x[!is.na(x)]
+  }
+  ux <- unique(x)
+  return(ux[which.max(tabulate(match(x, ux)))])
+}
+cv<-function(x){
+  (sqrt(var(x,na.rm=TRUE))/mean(x,na.rm=TRUE))*100
+}    
+five_p<-function(x)
+{
+  quantile(x, .05,na.rm=TRUE)
+}
+nf_p<-function(x)
+{
+  quantile(x, .95,na.rm=TRUE)
+}
+ci<-function (x, ci = 0.95) 
+{
+  a <- mean(x,na.rm=TRUE)
+  s <- sd(x,na.rm=TRUE)
+  n<-length(x[!is.na(x)])
+  error <- qt(ci + (1 - ci)/2, df = n - 1) * s/sqrt(n)
+  return(c(upper = a + error, mean = a, lower = a - error))
+} 
+
+library(moments)
+tmp <- do.call(data.frame, 
+               list (n = apply(sample_data, 2, length_exclude_na),
+                     count_na = apply(sample_data, 2, function(x) sum(is.na(x))),
+                     mean = apply(sample_data, 2, mean,na.rm=TRUE),
+                     mode = apply(sample_data, 2, Mode),
+                     sd = apply(sample_data, 2, sd,na.rm=TRUE),
+                     cv = apply(sample_data,2,cv),
+                     min = apply(sample_data, 2, min,na.rm=TRUE),
+                     max = apply(sample_data, 2, max,na.rm=TRUE),
+                     sum = apply(sample_data, 2, sum,na.rm=TRUE),
+                     var = apply(sample_data, 2, var,na.rm=TRUE),
+                     median = apply(sample_data, 2, median,na.rm=TRUE),
+                     quantile_five = apply(sample_data,2,five_p),
+                     quantile = t(apply(sample_data,2,quantile,na.rm=TRUE)),
+                     quantile_ninety_five = apply(sample_data,2,nf_p),
+                     skewness = apply(sample_data,2,skewness,na.rm=TRUE),
+                     kurtosis = apply(sample_data,2,kurtosis,na.rm=TRUE),
+                     CI = t(apply(sample_data,2,ci)),
+                     uncorrected_ss = apply(sample_data*sample_data,2,sum,na.rm=TRUE))) 
+
+tmp$range<-tmp$max-tmp$min
+tmp$std_error<-tmp$sd/sqrt(tmp$n)
+tmp$Lower_Quartile<-tmp$quantile.25.
+tmp$Upper_Quartile<-tmp$quantile.75.
+tmp$Quartile_Range<-tmp$Upper_Quartile-tmp$Lower_Quartile
+tmp$Corrected_SS<-tmp$var*(tmp$n-1)
+eda<-data.frame(tmp[,c(1:8,25,9:10,24,30,26,11,13,12,14:16,18,17,27:29,19,20,23,21)])
+write.csv(eda,"C:/Users/u278748/Desktop/Analysis_Segmentation_ISSA/data_ISP_NI_EDA_numeric.csv")
+
+### EDA for Individual
+
+####################################################
+sample_data <- Filter(is.numeric,data_ISP_I)
+sample_data <- sample_data[,-c(1)]
+library(taRifx)
+sample_data <- japply( sample_data, which(sapply(sample_data, class)=="factor"), as.character )
+sample_data <- japply( sample_data, which(sapply(sample_data, class)=="character"), as.numeric )
+
+
+length_exclude_na<-function(x)
+{
+  length(x[!is.na(x)])
+}
+Mode <- function(x, na.rm = TRUE) 
+{
+  if(na.rm){
+    x = x[!is.na(x)]
+  }
+  ux <- unique(x)
+  return(ux[which.max(tabulate(match(x, ux)))])
+}
+cv<-function(x){
+  (sqrt(var(x,na.rm=TRUE))/mean(x,na.rm=TRUE))*100
+}    
+five_p<-function(x)
+{
+  quantile(x, .05,na.rm=TRUE)
+}
+nf_p<-function(x)
+{
+  quantile(x, .95,na.rm=TRUE)
+}
+ci<-function (x, ci = 0.95) 
+{
+  a <- mean(x,na.rm=TRUE)
+  s <- sd(x,na.rm=TRUE)
+  n<-length(x[!is.na(x)])
+  error <- qt(ci + (1 - ci)/2, df = n - 1) * s/sqrt(n)
+  return(c(upper = a + error, mean = a, lower = a - error))
+} 
+
+library(moments)
+tmp <- do.call(data.frame, 
+               list (n = apply(sample_data, 2, length_exclude_na),
+                     count_na = apply(sample_data, 2, function(x) sum(is.na(x))),
+                     mean = apply(sample_data, 2, mean,na.rm=TRUE),
+                     mode = apply(sample_data, 2, Mode),
+                     sd = apply(sample_data, 2, sd,na.rm=TRUE),
+                     cv = apply(sample_data,2,cv),
+                     min = apply(sample_data, 2, min,na.rm=TRUE),
+                     max = apply(sample_data, 2, max,na.rm=TRUE),
+                     sum = apply(sample_data, 2, sum,na.rm=TRUE),
+                     var = apply(sample_data, 2, var,na.rm=TRUE),
+                     median = apply(sample_data, 2, median,na.rm=TRUE),
+                     quantile_five = apply(sample_data,2,five_p),
+                     quantile = t(apply(sample_data,2,quantile,na.rm=TRUE)),
+                     quantile_ninety_five = apply(sample_data,2,nf_p),
+                     skewness = apply(sample_data,2,skewness,na.rm=TRUE),
+                     kurtosis = apply(sample_data,2,kurtosis,na.rm=TRUE),
+                     CI = t(apply(sample_data,2,ci)),
+                     uncorrected_ss = apply(sample_data*sample_data,2,sum,na.rm=TRUE))) 
+
+tmp$range<-tmp$max-tmp$min
+tmp$std_error<-tmp$sd/sqrt(tmp$n)
+tmp$Lower_Quartile<-tmp$quantile.25.
+tmp$Upper_Quartile<-tmp$quantile.75.
+tmp$Quartile_Range<-tmp$Upper_Quartile-tmp$Lower_Quartile
+tmp$Corrected_SS<-tmp$var*(tmp$n-1)
+eda1<-data.frame(tmp[,c(1:8,25,9:10,24,30,26,11,13,12,14:16,18,17,27:29,19,20,23,21)])
+write.csv(eda1,"************/data_ISP_I_EDA_numeric.csv")
