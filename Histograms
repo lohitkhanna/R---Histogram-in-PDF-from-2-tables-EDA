@@ -1,0 +1,35 @@
+Aggregate_Data_at_Member_Level_US <- read_excel("****/aggregate Data at Member Level_US.xlsx",skip = 1)
+View(Aggregate_Data_at_Member_Level_US)
+colnames(Aggregate_Data_at_Member_Level_US)
+glimpse(Aggregate_Data_at_Member_Level_US)
+
+data_ISP_NI<-Aggregate_Data_at_Member_Level_US%>%filter(Class_Code=="ISP",Customer_Type=="NI")
+data_ISP_I<-Aggregate_Data_at_Member_Level_US%>%filter(Class_Code=="ISP",Customer_Type=="I")
+
+### Data with numeric variable
+sample_data_NI <- Filter(is.numeric,data_ISP_NI)
+sample_data_I <- Filter(is.numeric,data_ISP_I)
+### Removing ID column for histogram
+sample_data_NI <- sample_data_NI[,-c(1)]
+sample_data_I <- sample_data_I[,-c(1)]
+##Setting 0 to NA
+# sample_data_NI[sample_data_NI==0]<-NA
+# sample_data_I[sample_data_I==0]<-NA
+
+################# NI data split 
+Aggregate_Data_at_Member_Level_US <- Filter(is.numeric,Aggregate_Data_at_Member_Level_US)
+Aggregate_Data_at_Member_Level_US <- Aggregate_Data_at_Member_Level_US[,-c(1)]
+Aggregate_Data_at_Member_Level_US<-as.data.frame(Aggregate_Data_at_Member_Level_US)
+
+####### Plotting Graph by selecting same column from 2 different table and comparing and putting on 1 page of pdf ###############
+pdf("C:/Users/u278748/Desktop/Analysis_Segmentation_ISSA/graph Ind_nInd.pdf",onefile = TRUE) 
+
+for(i in 1:dim(sample_data_NI)[2])
+{
+  index = which(names(sample_data_I) == names(sample_data_NI)[i])
+  par(mfrow = c(2,1))
+  hist(as.numeric(unlist(sample_data_NI[,i])), breaks = 100, main = paste0("ISP_NI ", names(sample_data_NI[i])),xlab = paste0("Distribution of ", names(sample_data_NI[i])))
+  hist(as.numeric(unlist(sample_data_I[,index])), breaks = 100, main = paste0("ISP_I ", names(sample_data_I[index])),xlab = paste0("Distribution of ", names(sample_data_I[index])))
+}
+dev.off()
+
